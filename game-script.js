@@ -42,6 +42,9 @@ const STRESS = {
     SOBRE: 'Sobreesdrújula' // Actualizado para consistencia en la lista
 };
 
+// Estado del juego (declarar arriba para evitar TDZ)
+// ...variables ya declaradas arriba...
+
 // Lista de datos cargados
 let rawWords = null;
 const startButton = document.getElementById('start-button');
@@ -62,19 +65,21 @@ document.addEventListener('DOMContentLoaded', loadWords);
 // Añadir listeners como respaldo para evitar dependencias de atributos inline
 // (si el HTML todavía usa `onclick`, esto asegura que la función exista)
 // Versión de la aplicación (útil para debugging / UI)
-const APP_VERSION = 'v0.1.01';
+const APP_VERSION = 'v0.1.02';
 window.APP_VERSION = APP_VERSION;
 
 // Usar DOMContentLoaded para asegurarnos de que el handler se registre
 document.addEventListener('DOMContentLoaded', () => {
-    // startButton puede ser null si el DOM cambia; comprobamos antes
-    if (startButton) {
-        startButton.addEventListener('click', (e) => {
+    // Botón de inicio
+    const startBtn = document.getElementById('start-button');
+    if (startBtn) {
+        startBtn.addEventListener('click', (e) => {
             e.preventDefault();
             startGame();
         });
     }
 
+    // Botón de reinicio
     const resetBtn = document.getElementById('reset-button');
     if (resetBtn) {
         resetBtn.addEventListener('click', (e) => {
@@ -82,6 +87,25 @@ document.addEventListener('DOMContentLoaded', () => {
             resetGame();
         });
     }
+
+    // Botón de reintentar en pantalla de game over
+    const retryBtn = document.getElementById('retry-button');
+    if (retryBtn) {
+        retryBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            startGame();
+        });
+    }
+
+    // Botón de reintentar en pantalla de victoria
+    const winRetryBtn = document.getElementById('win-retry-button');
+    if (winRetryBtn) {
+        winRetryBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            startGame();
+        });
+    }
+
     // Actualizar el badge de versión en la UI si existe
     const verEl = document.getElementById('version-badge');
     if (verEl) verEl.textContent = APP_VERSION;
@@ -156,15 +180,7 @@ const finalScoreEl = document.getElementById('final-score');
 const winScoreEl = document.getElementById('win-score');
 
 // Estado del juego
-let gameLoopId;
-let gameState = 'MENU'; // MENU, PLAYING, GAMEOVER, WIN
-
-let score = 0;
-let lives = 5;
-let level = 1;
-let pointsForNextLevel = 75; 
-let baseSpeed = 0.3;
-let speedMultiplier = 1.0;
+// ...variables ya declaradas arriba...
 
 // Entidades
 let player = { x: 0, y: 0, width: 40, height: 40, color: '#00d2ff' };

@@ -248,7 +248,7 @@
                 </div>
                 <div class="hud-right">
                     <div id="lives-display">Vidas: 5</div>
-                    <button id="reset-button" class="reset-btn" onclick="resetGame()">Reiniciar Misión</button>
+                    <button id="reset-button" class="reset-btn">Reiniciar Misión</button>
                 </div>
             </div>
         </div>
@@ -260,7 +260,7 @@
             <p>Dispara con <strong>dos cañones</strong>: uno para el tipo de acentuación y otro para si lleva tilde o no.</p>
             <p>Si te equivocas, la palabra ganará un <strong>escudo protector</strong> que deberás romper.</p>
             
-            <button id="start-button" onclick="startGame()">INICIAR MISIÓN ESTÁNDAR</button>
+            <button id="start-button">INICIAR MISIÓN ESTÁNDAR</button>
         </div>
 
         <div id="game-over-screen" class="hidden">
@@ -268,14 +268,14 @@
             <p>La ignorancia ha conquistado el terreno.</p>
             <p id="final-score">Puntaje Final: 0</p>
             <!-- Botón de Explicación de Regla eliminado -->
-            <button onclick="startGame()">REINTENTAR</button>
+            <button id="retry-button">REINTENTAR</button>
         </div>
 
         <div id="win-screen" class="hidden">
             <h1>¡VICTORIA!</h1>
             <p>Has completado todas las palabras. ¡Eres un maestro de la ortografía!</p>
             <p id="win-score">Puntaje Final: 0</p>
-            <button onclick="startGame()">JUGAR DE NUEVO</button>
+            <button id="win-retry-button">JUGAR DE NUEVO</button>
         </div>
     </div>
     

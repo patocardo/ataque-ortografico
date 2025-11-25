@@ -61,6 +61,10 @@ window.onload = loadWords;
 
 // Añadir listeners como respaldo para evitar dependencias de atributos inline
 // (si el HTML todavía usa `onclick`, esto asegura que la función exista)
+// Versión de la aplicación (útil para debugging / UI)
+const APP_VERSION = 'v0.1.0';
+window.APP_VERSION = APP_VERSION;
+
 window.addEventListener('load', () => {
     // startButton puede ser null si el DOM cambia; comprobamos antes
     if (startButton) {
@@ -77,6 +81,9 @@ window.addEventListener('load', () => {
             resetGame();
         });
     }
+    // Actualizar el badge de versión en la UI si existe
+    const verEl = document.getElementById('version-badge');
+    if (verEl) verEl.textContent = APP_VERSION;
 });
 
 

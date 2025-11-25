@@ -56,16 +56,17 @@ function loadWords() {
     startButton.disabled = false;
 }
 
-// Llama a loadWords al iniciar la página
-window.onload = loadWords;
+// Llama a loadWords cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', loadWords);
 
 // Añadir listeners como respaldo para evitar dependencias de atributos inline
 // (si el HTML todavía usa `onclick`, esto asegura que la función exista)
 // Versión de la aplicación (útil para debugging / UI)
-const APP_VERSION = 'v0.1.0';
+const APP_VERSION = 'v0.1.01';
 window.APP_VERSION = APP_VERSION;
 
-window.addEventListener('load', () => {
+// Usar DOMContentLoaded para asegurarnos de que el handler se registre
+document.addEventListener('DOMContentLoaded', () => {
     // startButton puede ser null si el DOM cambia; comprobamos antes
     if (startButton) {
         startButton.addEventListener('click', (e) => {
@@ -134,8 +135,8 @@ const updateCanvasSize = () => {
     canvas.width = newWidth;
     canvas.height = newHeight;
     // Asegurarse de que el jugador se centre de nuevo si está jugando
-    if (gameState === 'PLAYING') {
-            player.y = canvas.height - 50;
+    if (typeof gameState !== 'undefined' && gameState === 'PLAYING') {
+        player.y = canvas.height - 50;
     }
 };
 

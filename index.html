@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ataque Ortográfico - Space Invaders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 2px solid #444;
+            max-width: 800px;
+            width: 95vw; 
+            margin-top: 10px;
+        }
+
+        canvas {
+            background-color: #0f0f1a;
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            text-shadow: 1px 1px 0 #000;
+        }
+        
+        /* --------------------------------- */
+        /* Controles y Sugerencias de Teclas */
+        /* --------------------------------- */
+        #controls-bottom-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            background: rgba(0,0,0,0.4);
+            border-top: 2px solid #333;
+        }
+
+        .controls-hint {
+            font-size: 12px;
+            color: #aaa;
+            text-align: center;
+            padding: 5px 0;
+            display: block; 
+        }
+
+        .key-badge {
+            display: inline-block;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin: 0 2px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .badge-aguda { color: #ff5555; }
+        .badge-grave { color: #55ff55; }
+        .badge-esd { color: #5555ff; }
+        .badge-sobre { color: #ffff55; }
+        .badge-tilde { color: #00ffff; }
+        .badge-notilde { color: #ff00ff; }
+
+        /* Controles Táctiles (Mobile/Touch) */
+        #touch-controls-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .touch-group {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .touch-group.movement {
+            gap: 20px;
+        }
+
+        .touch-btn {
+            pointer-events: auto;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-family: 'Roboto Mono', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: opacity 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+            font-weight: bold;
+        }
+        
+        .touch-btn:active {
+            opacity: 0.7;
+        }
+
+        /* Colores de los botones */
+        .btn-move { background: #333; color: #fff; }
+        .btn-aguda { background: #ff5555; color: #000; }
+        .btn-grave { background: #55ff55; color: #000; }
+        .btn-esd { background: #5555ff; color: #fff; }
+        .btn-sobre { background: #ffff55; color: #000; }
+        .btn-tilde { background: #00ffff; color: #000; }
+        .btn-notilde { background: #ff00ff; color: #000; }
+
+
+        /* --------------------------------- */
+        /* Pantallas de Estado */
+        /* --------------------------------- */
+
+        #start-screen, #game-over-screen, #win-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 26, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            z-index: 10;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+
+        h1 { font-size: clamp(30px, 5vw, 40px); margin-bottom: 10px; color: #00d2ff; }
+        h2 { font-size: clamp(24px, 4vw, 30px); color: #ff5555; }
+        p { font-size: clamp(14px, 2.5vw, 16px); max-width: 600px; text-align: center; line-height: 1.5; margin-bottom: 20px; }
+        
+        button {
+            background: #00d2ff;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: clamp(16px, 3vw, 20px);
+            font-family: 'Roboto Mono', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.1s;
+            margin-top: 10px;
+        }
+        
+        button.reset-btn {
+            pointer-events: auto;
+            background: #ff5555;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        button:hover:not(.reset-btn) { transform: scale(1.05); background: #fff; }
+        button.reset-btn:hover { background: #ff7777; }
+        
+        .hud-left, .hud-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .hidden { display: none !important; }
+
+        /* Media Query para pantallas pequeñas */
+        @media (max-width: 600px) {
+            .controls-hint {
+                display: none; /* Ocultar el hint de teclado en móviles */
+            }
+            .touch-group {
+                gap: 5px;
+            }
+            .touch-btn {
+                padding: 10px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- El canvas del juego -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- La capa de HUD (Score, Vidas, Nivel) -->
+        <div id="ui-layer">
+            <div class="hud-top">
+                <div class="hud-left">
+                    <div id="score-display">Puntos: 0</div>
+                    <div id="level-display" style="margin-left: 20px;">Nivel: 1</div>
+                </div>
+                <div class="hud-right">
+                    <div id="lives-display">Vidas: 5</div>
+                    <button id="reset-button" class="reset-btn" onclick="resetGame()">Reiniciar Misión</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pantallas de Estado -->
+        <div id="start-screen">
+            <h1>ATAQUE ORTOGRÁFICO</h1>
+            <p>Las palabras caen del cielo. Tu misión es clasificarlas antes de que toquen el suelo.</p>
+            <p>Dispara con <strong>dos cañones</strong>: uno para el tipo de acentuación y otro para si lleva tilde o no.</p>
+            <p>Si te equivocas, la palabra ganará un <strong>escudo protector</strong> que deberás romper.</p>
+            
+            <button id="start-button" onclick="startGame()">INICIAR MISIÓN ESTÁNDAR</button>
+        </div>
+
+        <div id="game-over-screen" class="hidden">
+            <h2>¡FIN DEL JUEGO!</h2>
+            <p>La ignorancia ha conquistado el terreno.</p>
+            <p id="final-score">Puntaje Final: 0</p>
+            <!-- Botón de Explicación de Regla eliminado -->
+            <button onclick="startGame()">REINTENTAR</button>
+        </div>
+
+        <div id="win-screen" class="hidden">
+            <h1>¡VICTORIA!</h1>
+            <p>Has completado todas las palabras. ¡Eres un maestro de la ortografía!</p>
+            <p id="win-score">Puntaje Final: 0</p>
+            <button onclick="startGame()">JUGAR DE NUEVO</button>
+        </div>
+    </div>
+    
+    <!-- Nueva área de controles para teclado y touch (fuera del canvas) -->
+    <div id="controls-bottom-area">
+        <!-- Controles Touch -->
+        <div id="touch-controls-row">
+            <!-- Movimiento (Izquierda/Derecha) -->
+            <div class="touch-group movement">
+                <button class="touch-btn btn-move" data-key="ArrowLeft" data-action="move" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    ⬅ MOVER
+                </button>
+                <button class="touch-btn btn-move" data-key="ArrowRight" data-action="move" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    MOVER ➡
+                </button>
+            </div>
+            
+            <!-- Disparos (Acentuación y Tilde) -->
+            <div class="touch-group">
+                <button class="touch-btn btn-aguda" data-key="KeyA" data-action="shoot" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    Aguda (A)
+                </button>
+                <button class="touch-btn btn-grave" data-key="KeyS" data-action="shoot" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    Grave (S)
+                </button>
+                <button class="touch-btn btn-esd" data-key="KeyD" data-action="shoot" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    Esdrújula (D)
+                </button>
+                <button class="touch-btn btn-sobre" data-key="KeyF" data-action="shoot" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    Sobre. (F)
+                </button>
+                <button class="touch-btn btn-tilde" data-key="KeyZ" data-action="shoot" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    Tilde (Z)
+                </button>
+                <button class="touch-btn btn-notilde" data-key="KeyX" data-action="shoot" ontouchstart="handleTouchAction(event)" ontouchend="handleTouchAction(event)">
+                    Sin Tilde (X)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Instrucciones de teclado (debajo de los controles táctiles) -->
+        <div class="controls-hint">
+            MOVER: ⬅ / ➡ (O botones táctiles) <br>
+            ACENTO: <span class="key-badge badge-aguda">A</span> Aguda | <span class="key-badge badge-grave">S</span> Grave | <span class="key-badge badge-esd">D</span> Esdrújula | <span class="key-badge badge-sobre">F</span> Sobre. <br>
+            TILDE: <span class="key-badge badge-tilde">Z</span> Con Tilde | <span class="key-badge badge-notilde">X</span> Sin Tilde
+        </div>
+    </div>
+
+
+    <script src="./game-script.js" />
+</body>
+</html>

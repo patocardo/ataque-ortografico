@@ -1,2 +1,2 @@
-# ataque-ortografico
-Juego para mejorar la acentuación
+# Ataque Ortografico
+Juego para mejorar el análisis prosódico

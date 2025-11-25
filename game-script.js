@@ -2,6 +2,24 @@
  * CONFIGURACIÓN Y BASE DE DATOS EMBEBIDOS (SIN LLAMADAS A API EXTERNAS)
  */
 
+// --- VARIABLES DE ESTADO Y ELEMENTOS DOM ---
+let gameLoopId = null;
+let gameState = 'MENU'; // MENU, PLAYING, GAMEOVER, WIN
+let score = 0;
+let lives = 5;
+let level = 1;
+let pointsForNextLevel = 75;
+let baseSpeed = 0.3;
+let speedMultiplier = 1.0;
+let rawWords = null;
+let masterWordList = [];
+let player = { x: 0, y: 0, width: 40, height: 40, color: '#00d2ff' };
+let bullets = [];
+let activeWords = [];
+let keysPressed = {};
+const APP_VERSION = 'v0.1.03';
+window.APP_VERSION = APP_VERSION;
+
 // Datos de palabras incrustados directamente
 const EMBEDDED_WORD_DATA = {
     "frecuentes": [
@@ -44,13 +62,7 @@ const STRESS = {
 
 // Estado del juego (declarar arriba para evitar TDZ)
 // ...variables ya declaradas arriba...
-
-// Lista de datos cargados
-let rawWords = null;
 const startButton = document.getElementById('start-button');
-
-// Lista maestra final que contiene todas las palabras barajadas.
-let masterWordList = [];
 
 function loadWords() {
     // Usar datos incrustados
@@ -61,12 +73,6 @@ function loadWords() {
 
 // Llama a loadWords cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', loadWords);
-
-// Añadir listeners como respaldo para evitar dependencias de atributos inline
-// (si el HTML todavía usa `onclick`, esto asegura que la función exista)
-// Versión de la aplicación (útil para debugging / UI)
-const APP_VERSION = 'v0.1.02';
-window.APP_VERSION = APP_VERSION;
 
 // Usar DOMContentLoaded para asegurarnos de que el handler se registre
 document.addEventListener('DOMContentLoaded', () => {
@@ -165,7 +171,7 @@ const updateCanvasSize = () => {
 };
 
 window.addEventListener('resize', updateCanvasSize);
-// Llamar al inicio para establecer el tamaño correcto
+
 updateCanvasSize();
 
 
@@ -179,19 +185,9 @@ const winScreen = document.getElementById('win-screen');
 const finalScoreEl = document.getElementById('final-score');
 const winScoreEl = document.getElementById('win-score');
 
-// Estado del juego
-// ...variables ya declaradas arriba...
-
-// Entidades
-let player = { x: 0, y: 0, width: 40, height: 40, color: '#00d2ff' };
-let bullets = [];
-let activeWords = [];
-let keysPressed = {};
-
 // Mapeo de teclas a tipos de disparo
 const KEY_MAP = {
     'KeyA': { type: STRESS.AGUDA, category: 'STRESS', color: '#ff5555' },
-    'KeyS': { type: STRESS.GRAVE, category: 'STRESS', color: '#55ff55' },
     'KeyD': { type: STRESS.ESDRUJULA, category: 'STRESS', color: '#5555ff' },
     'KeyF': { type: STRESS.SOBRE, category: 'STRESS', color: '#ffff55' },
     'KeyZ': { type: true, category: 'TILDE', color: '#00ffff' }, // Con tilde

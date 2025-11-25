@@ -59,6 +59,26 @@ function loadWords() {
 // Llama a loadWords al iniciar la página
 window.onload = loadWords;
 
+// Añadir listeners como respaldo para evitar dependencias de atributos inline
+// (si el HTML todavía usa `onclick`, esto asegura que la función exista)
+window.addEventListener('load', () => {
+    // startButton puede ser null si el DOM cambia; comprobamos antes
+    if (startButton) {
+        startButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            startGame();
+        });
+    }
+
+    const resetBtn = document.getElementById('reset-button');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetGame();
+        });
+    }
+});
+
 
 /**
  * Prepara la lista de palabras para el juego (usando mapeo directo)

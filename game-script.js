@@ -536,3 +536,11 @@ document.addEventListener('keyup', (e) => {
         keysPressed[e.key] = false;
     }
 });
+
+// Exponer funciones al ámbito global para handlers inline en el HTML
+// (si el script se carga con `type="module"` o similar, las
+// funciones no quedan en `window` automáticamente).
+window.startGame = startGame;
+window.resetGame = resetGame;
+window.gameOver = gameOver;
+window.gameWin = gameWin;

@@ -17,7 +17,7 @@ let player = { x: 0, y: 0, width: 40, height: 40, color: '#00d2ff' };
 let bullets = [];
 let activeWords = [];
 let keysPressed = {};
-const APP_VERSION = 'v0.1.03';
+const APP_VERSION = 'v0.1.04';
 window.APP_VERSION = APP_VERSION;
 
 // Datos de palabras incrustados directamente
@@ -62,13 +62,15 @@ const STRESS = {
 
 // Estado del juego (declarar arriba para evitar TDZ)
 // ...variables ya declaradas arriba...
-const startButton = document.getElementById('start-button');
 
 function loadWords() {
     // Usar datos incrustados
-    rawWords = EMBEDDED_WORD_DATA; 
-    startButton.textContent = 'INICIAR MISIÓN ESTÁNDAR';
-    startButton.disabled = false;
+    rawWords = EMBEDDED_WORD_DATA;
+    const sb = document.getElementById('start-button');
+    if (sb) {
+        sb.textContent = 'INICIAR MISIÓN ESTÁNDAR';
+        sb.disabled = false;
+    }
 }
 
 // Llama a loadWords cuando el DOM esté listo
@@ -188,6 +190,7 @@ const winScoreEl = document.getElementById('win-score');
 // Mapeo de teclas a tipos de disparo
 const KEY_MAP = {
     'KeyA': { type: STRESS.AGUDA, category: 'STRESS', color: '#ff5555' },
+    'KeyS': { type: STRESS.GRAVE, category: 'STRESS', color: '#55ff55' },
     'KeyD': { type: STRESS.ESDRUJULA, category: 'STRESS', color: '#5555ff' },
     'KeyF': { type: STRESS.SOBRE, category: 'STRESS', color: '#ffff55' },
     'KeyZ': { type: true, category: 'TILDE', color: '#00ffff' }, // Con tilde
